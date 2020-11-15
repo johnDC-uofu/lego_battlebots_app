@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">LEGO BattleBots</string>
+    <string name="login">Login</string>
+    <string name="battle">Battle!</string>
+    <string name="register">Register</string>
+    <string name="email">Email: </string>
+    <string name="password">Password: </string>
+    <string name="scan">Scan Again</string>
+    <string name="connect">Connect!</string>
+    <string name="emailHint">user@example.com</string>
+    <string name="passwordHint">*********</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="attack">Attack</string>
+    <string name="attack_1">Attack 1</string>
+    <string name="attack_2">Attack 2</string>
+</resources>

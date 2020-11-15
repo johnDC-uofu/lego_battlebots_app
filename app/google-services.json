@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "247336975618",
+    "firebase_url": "https://lego-battlebots.firebaseio.com",
+    "project_id": "lego-battlebots",
+    "storage_bucket": "lego-battlebots.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:247336975618:android:dcd3f1337eaae53a55961b",
+        "android_client_info": {
+          "package_name": "com.asimplenerd.legobattlebots"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "247336975618-7it749ip4if41sijqmojds7id1u4vr2s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJYKD1Tb1m4Wvm1mQ2A0TNQyYMPV8larI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "247336975618-7it749ip4if41sijqmojds7id1u4vr2s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
