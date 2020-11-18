@@ -7,17 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_connection.*
+import com.asimplenerd.legobattlebots.WeaponSelectFragment.Companion.attackId
 import kotlinx.android.synthetic.main.play_screen.*
 
-class Game : Fragment(), View.OnClickListener {
+class Game(attackId: String) : Fragment(), View.OnClickListener, Joystick.JoystickListener {
 
     companion object {
         val botId = "100"
+        var joystickPosX = "0"
+        var joystickPosY = "0"
+        var attacks = 0;
+
     }
 
 
-    val gameLoop = GameLoop(this, 100)
+    val armorLoop = GameLoop(this, 100)
+    val outputLoop = GameLoop(this, 10)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,7 +47,8 @@ class Game : Fragment(), View.OnClickListener {
         updateUserName(MainActivity.username)
 
         updatebotId(ConnectionFragment.botId)
-        gameLoop.startLoop()
+        armorLoop.startLoop(false)
+        outputLoop.startLoop(true)
     }
 
     override fun onClick(v: View?) {
@@ -64,14 +70,10 @@ class Game : Fragment(), View.OnClickListener {
 
 
     fun mainAttack(){
-        hpBar.progress =  hpBar.progress - 10
-
-
+        attacks += 1
     }
 
     fun sideAttack(){
-        hpBar.progress =  hpBar.progress - 5
-
     }
 
     fun gameOver(){
@@ -79,19 +81,45 @@ class Game : Fragment(), View.OnClickListener {
         fragMan.beginTransaction().replace(R.id.interactionFragment, GameOverFragment()).addToBackStack("Welcome").commit()
     }
 
-    fun update() {
-        Log.d("Updated", "got updated; ")
-        try {
-            if (hpBar.progress == 0) {
-                gameOver()
-                hpBar.progress = 100;
-                gameLoop.endLoop();
+    fun update(output : Boolean) {
+
+        if(output)
+        {
+            //Log.d("Updated", "output; ")
+            try {
+                val data = "Move Direction=" + MainActivity.direction + ", Speed=" + MainActivity.speed + " /n Attack Code=" + attackId + ", Amount= " + attacks + " end"
+                toBluetooth(data)
+                attacks = 0;
+            } catch (e: Exception) {
+                outputLoop.endLoop();
+                e.printStackTrace()
             }
         }
-        catch (e: Exception) {
-            gameLoop.endLoop();
-            e.printStackTrace()
+        else {
+            //Log.d("Updated", "armor; ")
+            try {
+                if (hpBar.progress == 0) {
+                    gameOver()
+                    hpBar.progress = 100;
+                    armorLoop.endLoop();
+                }
+            } catch (e: Exception) {
+                armorLoop.endLoop();
+                e.printStackTrace()
+            }
         }
+    }
+
+    fun toBluetooth(data : String){
+        //TODO : send this data to device through bluetooth
+        Log.d("To Bluetooth", data);
+    }
+
+    override fun onJoystickMoved(xPercent: Float, yPercent: Float, id: Int) {
+        joystickPosX = xPercent.toString()
+        joystickPosY = yPercent.toString()
+
+        Log.d("To Bluetooth", "GOT HERE GOT HERE");
     }
 
 

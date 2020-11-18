@@ -33,7 +33,7 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        val battleBtn = this.view!!.findViewById<Button>(R.id.battleBtn)
+        val battleBtn = this.view!!.findViewById<Button>(R.id.battleBtn) 
         val loginBtn = this.view!!.findViewById<Button>(R.id.loginBtn)
         battleBtn.setOnClickListener(this)
         loginBtn.setOnClickListener(this)

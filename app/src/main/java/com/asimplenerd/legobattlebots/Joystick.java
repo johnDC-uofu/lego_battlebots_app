@@ -189,6 +189,7 @@ public class Joystick extends SurfaceView implements SurfaceHolder.Callback, Vie
 
 public interface JoystickListener
     {
+
         void onJoystickMoved(float xPercent, float yPercent, int id);
     }
 }

@@ -34,6 +34,8 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
     companion object {
         var username =""
         private const val TAG = "KotlinActivity"
+        var speed = "0"
+        var direction = "0"
     }
 
     val scanReceiver = object : BroadcastReceiver(){
@@ -110,14 +112,17 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
         if(xPercent < 0.8 && xPercent > -0.8 && yPercent < 0.8 && yPercent > -0.8){
             if(xPercent < 0.3 && xPercent > -0.3 && yPercent < 0.3 && yPercent > -0.3) {
                 speedValue.text = "Stopped"
+                speed = "0"
             }
             else {
                 speedValue.text = "Slow"
+                speed = "1"
             }
 
         }
         else {
             speedValue.text = "Fast"
+            speed = "2"
         }
 
         if(xPercent < 0.3 || xPercent > -0.3 || yPercent < 0.3 || yPercent > -0.3)
@@ -127,21 +132,25 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
                     if(xPercent > 0.3 && xPercent < 0.6)
                     {
                         dirValue.text = "30"
+                        direction = "30"
 
                     }
                     else if(xPercent > 0.6 && xPercent < 1)
                     {
                         dirValue.text = "60"
+                        direction = "60"
 
                     }
                     else if(xPercent > 1)
                     {
                         dirValue.text = "90"
+                        direction = "90"
 
                     }
                     else
                     {
                         dirValue.text = "0"
+                        direction = "0"
                     }
             }
             else  //X is negative
@@ -149,21 +158,25 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
                 if(xPercent < -0.3 && xPercent > -0.6)
                 {
                     dirValue.text = "330"
+                    direction = "330"
 
                 }
                 else if(xPercent < -0.6 && xPercent > -1)
                 {
                     dirValue.text = "300"
+                    direction = "300"
 
                 }
                 else if(xPercent < -1)
                 {
                     dirValue.text = "270"
+                    direction = "270"
 
                 }
                 else
                 {
                     dirValue.text = "0"
+                    direction = "0"
                 }
 
             }
@@ -179,6 +192,7 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
         else {
 
             dirValue.text = "Stopped"
+            speed = "0";
         }
 
     }

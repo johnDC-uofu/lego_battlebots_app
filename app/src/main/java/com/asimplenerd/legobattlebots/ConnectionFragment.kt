@@ -72,7 +72,7 @@ class ConnectionFragment : Fragment(), View.OnClickListener  {
        // AnimationUtils.loadAnimation(MainActivity.,R.anim.button_animator)
 
         when(v?.id){
-            R.id.connectBtn -> showGameFrag()
+            R.id.connectBtn -> showWeaponsFrag()
             R.id.goBackBtn -> showMenuFrag()
 
             R.id.botSelectBtn1 -> selectedBot1()
@@ -108,9 +108,9 @@ class ConnectionFragment : Fragment(), View.OnClickListener  {
     }
 
 
-    fun showGameFrag(){
+    fun showWeaponsFrag(){
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, Game()).addToBackStack("Game").commit()
+        fragMan.beginTransaction().replace(R.id.interactionFragment, WeaponSelectFragment()).addToBackStack("Game").commit()
     }
 
     fun showMenuFrag(){
