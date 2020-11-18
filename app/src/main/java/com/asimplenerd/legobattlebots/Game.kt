@@ -1,11 +1,14 @@
 package com.asimplenerd.legobattlebots
 
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.asimplenerd.legobattlebots.WeaponSelectFragment.Companion.attackId
 import kotlinx.android.synthetic.main.play_screen.*
@@ -106,30 +109,16 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
 
                 fromBluetooth()
 
-                if(armor == 3)
-                {
-                    hpBar.progress = 100
-                }
 
-                if(armor == 2)
-                {
-                    hpBar.progress = 66
-                }
 
-                if(armor == 1)
-                {
-                    hpBar.progress = 33
-                }
-
-                if(armor == 0)
-                {
-                    hpBar.progress = 0
-                }
+                val percent = armor.toFloat() / MAX_ARMOR_LEVEL.toFloat() * 100.0F
+                Log.d("Percent: ", percent.toString())
+                hpBar.progress = percent.toInt()
 
                 if (hpBar.progress == 0) {
                     gameOver()
                     hpBar.progress = 100
-                    var armor = MAX_ARMOR_LEVEL
+                    armor = MAX_ARMOR_LEVEL
                     armorLoop.endLoop()
                     outputLoop.endLoop()
                 }
@@ -140,6 +129,7 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun fromBluetooth() {
         //TODO : receive this data to device through bluetooth, this random armor decrement is for testing purposes only
 
@@ -148,6 +138,8 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
         if(randomNum == 10)
         {
             armor -= 1
+            //VibrationEffect.createOneShot(1000,100)
+            VibrationEffect.EFFECT_HEAVY_CLICK
         }
 
         Log.d("From Bluetooth", "armor set to: " + armor)
