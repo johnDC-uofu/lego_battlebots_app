@@ -29,11 +29,11 @@ public class Joystick extends SurfaceView implements SurfaceHolder.Callback, Vie
 
     private void setupDimensions()
     {
-        centerX = getWidth() / 2;
-        centerY = getHeight() / 2;
-        baseRadius = Math.min(getWidth(), getHeight()) / 3;
-        hatRadius = Math.min(getWidth(), getHeight()) / 5;
-    }
+    centerX = getWidth() / 2;
+    centerY = getHeight() / 2;
+    baseRadius = Math.min(getWidth(), getHeight()) / 3;
+    hatRadius = Math.min(getWidth(), getHeight()) / 5;
+}
 
     public Joystick(Context context)
     {
@@ -128,7 +128,7 @@ public class Joystick extends SurfaceView implements SurfaceHolder.Callback, Vie
                     drawJoystick(e.getX(), e.getY());
 
                     float xValue = (e.getX() - centerX)/baseRadius;
-                    float yValue = (e.getY() - centerY)/baseRadius;
+                    float yValue = -(e.getY() - centerY)/baseRadius;
                     if(xValue > 1)
                     {
                         xValue = 1;
@@ -156,7 +156,7 @@ public class Joystick extends SurfaceView implements SurfaceHolder.Callback, Vie
                     float constrainedY = centerY + (e.getY() - centerY) * ratio + 3;
                     drawJoystick(constrainedX, constrainedY);
                     float xValue = (e.getX() - centerX)/baseRadius;
-                    float yValue = (e.getY() - centerY)/baseRadius;
+                    float yValue = -(e.getY() - centerY)/baseRadius;
                     if(xValue > 1)
                     {
                         xValue = 1;

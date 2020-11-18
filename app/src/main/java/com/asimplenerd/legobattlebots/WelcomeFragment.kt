@@ -19,6 +19,7 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
 
     companion object {
         fun newInstance() = WelcomeFragment()
+        var loggedIn = false
         //val vibe = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     }
 
@@ -37,6 +38,16 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
         val loginBtn = this.view!!.findViewById<Button>(R.id.loginBtn)
         battleBtn.setOnClickListener(this)
         loginBtn.setOnClickListener(this)
+
+        if(MainActivity.username.isEmpty())
+        {
+            loginBtn.text = "Login"
+        }
+        else {
+            loggedIn = true
+            loginBtn.text = "Logout"
+        }
+
         updateUserName(MainActivity.username)
     }
 
@@ -69,8 +80,18 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
 //    }
 
     fun showLoginFrag(){
-        val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, LoginFragment()).addToBackStack("Welcome").commit()
+        if(loggedIn)
+        {
+            MainActivity.username = ""
+            updateUserName(MainActivity.username)
+            loginBtn.text = "Login"
+            loggedIn = false
+        }
+        else {
+            val fragMan = this.parentFragmentManager
+            fragMan.beginTransaction().replace(R.id.interactionFragment, LoginFragment())
+                .addToBackStack("Welcome").commit()
+        }
     }
 
     fun buttonEffect(button: View) {

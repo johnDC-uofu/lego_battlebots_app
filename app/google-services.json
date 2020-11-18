@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "247336975618-auhshtl0maj0mrnn6pesrs9qtahv4sro.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.asimplenerd.legobattlebots",
+            "certificate_hash": "fc305b82eade45f56166b2eb9ab6f3b1358c0605"
+          }
+        },
+        {
           "client_id": "247336975618-7it749ip4if41sijqmojds7id1u4vr2s.apps.googleusercontent.com",
           "client_type": 3
         }
