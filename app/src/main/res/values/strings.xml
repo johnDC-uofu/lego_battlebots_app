@@ -14,4 +14,6 @@
     <string name="attack">Attack</string>
     <string name="attack_1">Attack 1</string>
     <string name="attack_2">Attack 2</string>
+    <!-- Layout Strings -->
+    <string name="select">Select!</string>
 </resources>

@@ -39,6 +39,8 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
         battleBtn.setOnClickListener(this)
         loginBtn.setOnClickListener(this)
 
+        MainActivity.startScan() //Look for devices in background
+
         if(MainActivity.username.isEmpty())
         {
             loginBtn.text = "Login"
@@ -70,6 +72,8 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
     }
 
     fun showConnectionFrag(){
+        //Stop scanning for new devices as we will need the list now
+        MainActivity.stopScan()
         val fragMan = this.parentFragmentManager
         fragMan.beginTransaction().replace(R.id.interactionFragment, ConnectionFragment()).addToBackStack("Connect").commit()
     }

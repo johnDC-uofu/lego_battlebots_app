@@ -1,6 +1,7 @@
 package com.asimplenerd.legobattlebots
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -17,8 +18,10 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.fragment_connection.*
 import kotlinx.android.synthetic.main.play_screen.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
@@ -29,7 +32,24 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
         var xPos = "0"
         var yPos = "0"
         var decimalPlaces = 3
+        var botList : ArrayList<BattleBot> = ArrayList()
+        val adapter = BluetoothAdapter.getDefaultAdapter()
         //var mAuth: FirebaseAuth? = null
+        fun getBots(): ArrayList<BattleBot> {
+            return botList
+        }
+        fun startScan(){
+            if(!adapter.isDiscovering) {
+                adapter.startDiscovery()
+                Log.i("Discovery", "BLUETOOTH DISC STARTED")
+            }
+        }
+        fun stopScan(){
+            if(adapter.isDiscovering) {
+                adapter.cancelDiscovery()
+                Log.i("Discovery", "BLUETOOTH DISC STOPPED")
+            }
+        }
     }
 
     val scanReceiver = object : BroadcastReceiver(){
@@ -37,11 +57,13 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
             when(intent?.action){
                 BluetoothDevice.ACTION_FOUND -> {
                     val name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME)
-                    val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE).address
-                    if(!deviceAddrs.contains(device)) {
-                        Log.d("Scan", "Found bluetooth device: $name:$device")
+                    val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)!!
+                    val deviceAddr = device.address
+                    if(!deviceAddrs.contains(deviceAddr) && name == BOT_IDENTIFIER) {
+                        Log.d("Scan", "Found bluetooth device: $name:$deviceAddr")
+                        botList.add(BattleBot(device, name))
                         deviceNames.add(name)
-                        deviceAddrs.add(device)
+                        deviceAddrs.add(deviceAddr)
                     }
                 }
                 else -> Log.d("Scan", "Got here")
@@ -52,12 +74,13 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
 
     val deviceNames = ArrayList<String>()
     val deviceAddrs = ArrayList<String>()
+    val BOT_IDENTIFIER = "raspberrypi" //Name of battlebot devices. To change with hostname
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val joystick = this.joystick
-
+        botList = ArrayList()
         if(PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PermissionChecker.PERMISSION_GRANTED){
             requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 1)
         }
@@ -65,8 +88,18 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
             requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_ADMIN), 2)
         }
         val filter = IntentFilter()
+        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         filter.addAction(BluetoothDevice.ACTION_FOUND)
         registerReceiver(scanReceiver, filter)
+        //Ensure bluetooth adapter is enabled
+        if(!bluetoothAdapter.isEnabled){
+            bluetoothAdapter.enable()
+        }
+        for(dev : BluetoothDevice in bluetoothAdapter.bondedDevices){
+            botList.add(BattleBot(dev, dev.name))
+            Log.d("Added device", "${dev.name} : ${dev.address}")
+        }
+        bluetoothAdapter.startDiscovery()
         this.supportActionBar!!.hide()
         supportFragmentManager.beginTransaction().add(R.id.interactionFragment, WelcomeFragment()).commitNow()
 
@@ -96,6 +129,11 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
 //        })
 
     }
+
+    public fun getBots(): ArrayList<BattleBot> {
+        return botList
+    }
+
 //
 //    override fun onStart() {
 //        super.onStart()

@@ -1,27 +1,19 @@
 package com.asimplenerd.legobattlebots
 
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
-import android.bluetooth.le.*
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.os.ParcelUuid
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.Button
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_connection.*
-import kotlinx.android.synthetic.main.fragment_welcome.*
 import java.util.*
+import java.util.logging.Logger
 
 /**
  * A simple [Fragment] subclass.
@@ -54,14 +46,13 @@ class ConnectionFragment : Fragment(), View.OnClickListener  {
         super.onActivityCreated(savedInstanceState)
         val connectBtn = this.view!!.findViewById<Button>(R.id.connectBtn)
         val goBackBtn = this.view!!.findViewById<Button>(R.id.goBackBtn)
-        val selectBtn1 = this.view!!.findViewById<Button>(R.id.botSelectBtn1)
-        val selectBtn2 = this.view!!.findViewById<Button>(R.id.botSelectBtn2)
+        val botListView = this.view!!.findViewById<RecyclerView>(R.id.availableBattleBotsList)
+
         goBackBtn.setOnClickListener(this)
-        selectBtn1.setOnClickListener(this)
-        selectBtn2.setOnClickListener(this)
+
 
         connectBtn.visibility = View.INVISIBLE
-
+        val botListAdapter = BattleBotAdapter(MainActivity.getBots())
 
         updateUserName(MainActivity.username)
     }
@@ -75,38 +66,24 @@ class ConnectionFragment : Fragment(), View.OnClickListener  {
             R.id.connectBtn -> showWeaponsFrag()
             R.id.goBackBtn -> showMenuFrag()
 
-            R.id.botSelectBtn1 -> selectedBot1()
-            R.id.botSelectBtn2 -> selectedBot2()
+            //We really need to generate buttons based on the available bots FOUND, not just two devices.
+
         }
     }
 
 
     fun updateUserName(name : String)
     {
-        loggedInText3.text = "Logged in as: " + name
+        loggedInText3.text = "Logged in as: $name"
     }
 
-    fun selectedBot1()
-    {
-        botId = botIdText1.text.toString()
+    fun selectBot(id: String, dev: BluetoothDevice?){
+        botId = id
         connectBtn.setOnClickListener(this)
-
-
-        botSelectedText.text = "Bot Selected: " + botIdText1.text
+        botSelectedText.text = "Bot Selected: $botId"
+        Log.i("DEV", "${dev?.address}")
         connectBtn.visibility = View.VISIBLE
-        connectBtn.isEnabled
     }
-
-    fun selectedBot2()
-    {
-        botId = botIdText2.text.toString()
-        connectBtn.setOnClickListener(this)
-
-        botSelectedText.text = "Bot Selected: " + botIdText2.text
-        connectBtn.visibility = View.VISIBLE
-        connectBtn.isEnabled
-    }
-
 
     fun showWeaponsFrag(){
         val fragMan = this.parentFragmentManager
