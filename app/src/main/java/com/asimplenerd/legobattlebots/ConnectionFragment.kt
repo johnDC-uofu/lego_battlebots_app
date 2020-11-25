@@ -36,6 +36,7 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
             var botId = "100"
             var battleBot : BattleBot? = null
             fun newInstance() = ConnectionFragment()
+            var recycler : RecyclerView? = null
         }
 
         override fun onCreateView(
@@ -54,7 +55,7 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
         val connectBtn = this.view!!.findViewById<Button>(R.id.connectBtn)
         val goBackBtn = this.view!!.findViewById<Button>(R.id.goBackBtn)
         val botListView = this.view!!.findViewById<RecyclerView>(R.id.availableBattleBotsList)
-
+        recycler = botListView
         goBackBtn.setOnClickListener(this)
 
         connectBtn.visibility = View.INVISIBLE
@@ -74,8 +75,11 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
 
         when(v?.id){
             R.id.connectBtn -> {
-                    if (battleBot != null && battleBot!!.connect())
-                        showWeaponsFrag()
+                    if (battleBot != null && battleBot!!.connect()) {
+                        //Stop adapter scan for faster connection
+                            MainActivity.stopScan()
+                            showWeaponsFrag()
+                    }
                     else
                         Toast.makeText(
                             context,

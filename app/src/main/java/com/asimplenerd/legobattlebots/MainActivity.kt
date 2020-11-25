@@ -75,6 +75,7 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
                         if(!botList.contains(bot)) {
                             botList.add(bot)
                             Log.d("Adding Bot", "Bot has ID ${bot.getID()}")
+                            ConnectionFragment.recycler?.adapter?.notifyDataSetChanged()
                         }
                     }
                 }

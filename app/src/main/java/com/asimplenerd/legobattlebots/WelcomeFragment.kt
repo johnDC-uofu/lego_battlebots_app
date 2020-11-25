@@ -71,7 +71,6 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
 
     fun showConnectionFrag(){
         //Stop scanning for new devices as we will need the list now
-        MainActivity.stopScan()
         val fragMan = this.parentFragmentManager
         fragMan.beginTransaction().replace(R.id.interactionFragment, ConnectionFragment()).addToBackStack("Connect").commit()
     }
