@@ -18,7 +18,7 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
     companion object {
 
         val MAX_ARMOR_LEVEL = 3
-        val botId = "100"
+        val botId = ConnectionFragment.botId
         var joystickPosX = "0"
         var joystickPosY = "0"
         var attacks = 0
@@ -96,7 +96,7 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
         {
             //Log.d("Updated", "output; ")
             try {
-                toBluetooth(MainActivity.xPos, MainActivity.yPos, attackId, attacks.toString())
+                toBluetooth(MainActivity.xPos, MainActivity.yPos, attackId!!, attacks.toString())
                 attacks = 0;
             } catch (e: Exception) {
                 outputLoop.endLoop();

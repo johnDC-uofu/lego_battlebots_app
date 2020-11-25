@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -25,11 +26,11 @@ import java.util.logging.Logger
 
 public val BATTLEBOT_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee")
 
-class ConnectionFragment : Fragment(), View.OnClickListener  {
+class ConnectionFragment : Fragment(), View.OnClickListener{
 
         companion object {
             var botId = "100"
-
+            var battleBot : BattleBot? = null
             fun newInstance() = ConnectionFragment()
         }
 
@@ -52,7 +53,6 @@ class ConnectionFragment : Fragment(), View.OnClickListener  {
 
         goBackBtn.setOnClickListener(this)
 
-
         connectBtn.visibility = View.INVISIBLE
         val botListAdapter = BattleBotAdapter(MainActivity.getBots())
         botListView.adapter = botListAdapter
@@ -69,7 +69,7 @@ class ConnectionFragment : Fragment(), View.OnClickListener  {
        // AnimationUtils.loadAnimation(MainActivity.,R.anim.button_animator)
 
         when(v?.id){
-            R.id.connectBtn -> showWeaponsFrag()
+            R.id.connectBtn -> {if (battleBot != null) showWeaponsFrag()}
             R.id.goBackBtn -> showMenuFrag()
 
             //We really need to generate buttons based on the available bots FOUND, not just two devices.
@@ -83,11 +83,12 @@ class ConnectionFragment : Fragment(), View.OnClickListener  {
         loggedInText3.text = "Logged in as: $name"
     }
 
-    fun selectBot(id: String, dev: BluetoothDevice?){
-        botId = id
+    fun selectBot(bot : BattleBot){
+        botId = bot.getID().toString()
+        battleBot = bot
         connectBtn.setOnClickListener(this)
         botSelectedText.text = "Bot Selected: $botId"
-        Log.i("DEV", "${dev?.address}")
+        Log.i("DEV", "${bot.getDevice()?.address}")
         connectBtn.visibility = View.VISIBLE
     }
 

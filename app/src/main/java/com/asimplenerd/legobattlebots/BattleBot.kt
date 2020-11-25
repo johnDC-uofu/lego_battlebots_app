@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothSocket
 import android.util.Log
 import java.io.*
 import java.lang.Exception
+import java.util.*
 
 class BattleBot {
     private var id : Int = -1
@@ -15,6 +16,7 @@ class BattleBot {
     private var inStreamReader : BufferedReader? = null
     private var outStreamWriter : BufferedWriter? = null
     private var name : String = "BattleBot"
+    private var weapon : String = "Sword"
 
     constructor(id : Int){
         this.id = id
@@ -36,6 +38,14 @@ class BattleBot {
         this.name = name
     }
 
+    fun setWeapon(type : String){
+        when (type.toLowerCase(Locale.US)){
+            "axe" -> {this.weapon = "Axe"}
+            "sword" -> {this.weapon = "Sword"}
+            "lifter" -> {this.weapon = "Lifter"}
+        }
+    }
+
     fun setBluetoothDevice(dev : BluetoothDevice){
         device = dev
     }
@@ -50,6 +60,10 @@ class BattleBot {
 
     fun getID() : Int{
         return id
+    }
+
+    fun getDevice()  : BluetoothDevice? {
+        return device
     }
 
     fun retrieveID() : Boolean {
@@ -94,11 +108,21 @@ class BattleBot {
                 }
             }
             catch (ex : Exception){
-                Log.e("BLUETOOTH SOCK ERR", "${ex.printStackTrace()}")
                 return false
             }
         }
         return false
+    }
+
+    fun connect(){
+        if(bluetoothSocket == null){
+            throw Exception("No socket has been created!")
+        }
+        bluetoothSocket!!.connect()
+        inStreamReader = BufferedReader(bluetoothSocket!!.inputStream.reader())
+        outStreamWriter = BufferedWriter(bluetoothSocket!!.outputStream.writer())
+        outStreamWriter!!.write("HELLO")
+        bluetoothSocket!!.close()
     }
 
 }

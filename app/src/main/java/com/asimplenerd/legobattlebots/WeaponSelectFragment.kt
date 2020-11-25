@@ -34,7 +34,7 @@ import java.util.*
 class WeaponSelectFragment : Fragment(), View.OnClickListener  {
 
     companion object {
-        var attackId = "0"
+        var attackId : String? = null
     }
 
     override fun onCreateView(
@@ -75,9 +75,15 @@ class WeaponSelectFragment : Fragment(), View.OnClickListener  {
             R.id.goBattleBtn -> showGameFrag()
             R.id.goBackBtn -> goBackFrag()
 
-            R.id.weaponSelectBtn1 -> selectedWeapon1()
-            R.id.weaponSelectBtn2 -> selectedWeapon2()
-            R.id.weaponSelectBtn3 -> selectedWeapon3()
+            R.id.weaponSelectBtn1 -> {
+                selectWeapon("Sword")
+            }
+            R.id.weaponSelectBtn2 -> {
+                selectWeapon("Axe")
+            }
+            R.id.weaponSelectBtn3 -> {
+                selectWeapon("Lifter")
+            }
         }
     }
 
@@ -87,38 +93,20 @@ class WeaponSelectFragment : Fragment(), View.OnClickListener  {
         loggedInText3.text = "Logged in as: " + name
     }
 
-    fun selectedWeapon1()
+    fun selectWeapon(weaponName : String)
     {
-        attackId = weaponIdText1.text.toString()
+        attackId = weaponName
         goBattleBtn.setOnClickListener(this)
-        weaponSelectedText.text = "Weapon Selected: " + attackId
+        weaponSelectedText.text = "Weapon Selected: $weaponName"
         goBattleBtn.visibility = View.VISIBLE
-        goBattleBtn.isEnabled
-    }
-
-    fun selectedWeapon2()
-    {
-        attackId = weaponIdText2.text.toString()
-        goBattleBtn.setOnClickListener(this)
-        weaponSelectedText.text = "Weapon Selected: " + attackId
-        goBattleBtn.visibility = View.VISIBLE
-        goBattleBtn.isEnabled
-    }
-
-    fun selectedWeapon3()
-    {
-        attackId = weaponIdText3.text.toString()
-        goBattleBtn.setOnClickListener(this)
-        weaponSelectedText.text = "Weapon Selected: " + attackId
-        goBattleBtn.visibility = View.VISIBLE
-        goBattleBtn.isEnabled
+        ConnectionFragment.battleBot?.setWeapon(weaponName)
     }
 
 
 
     fun showGameFrag(){
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, Game(attackId)).addToBackStack("Game").commit()
+        fragMan.beginTransaction().replace(R.id.interactionFragment, Game(attackId!!)).addToBackStack("Game").commit()
     }
 
     fun goBackFrag(){
