@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,10 +12,13 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_connection.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.logging.Logger
 
@@ -69,7 +73,16 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
        // AnimationUtils.loadAnimation(MainActivity.,R.anim.button_animator)
 
         when(v?.id){
-            R.id.connectBtn -> {if (battleBot != null) showWeaponsFrag()}
+            R.id.connectBtn -> {
+                    if (battleBot != null && battleBot!!.connect())
+                        showWeaponsFrag()
+                    else
+                        Toast.makeText(
+                            context,
+                            "FAILED TO CONNECT TO BOT WITH ID: $botId",
+                            Toast.LENGTH_LONG
+                        ).show()
+            }
             R.id.goBackBtn -> showMenuFrag()
 
             //We really need to generate buttons based on the available bots FOUND, not just two devices.

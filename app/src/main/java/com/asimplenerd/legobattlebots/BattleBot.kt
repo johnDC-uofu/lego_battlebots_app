@@ -18,6 +18,10 @@ class BattleBot {
     private var name : String = "BattleBot"
     private var weapon : String = "Sword"
 
+    companion object{
+        val BOT_IDENTIFIER = "BattleBot"
+    }
+
     constructor(id : Int){
         this.id = id
         device = null
@@ -29,8 +33,12 @@ class BattleBot {
     }
 
     constructor(device: BluetoothDevice, name : String?){
-        if(name != null)
+        if(name != null) {
             this.name = name
+            val idTemp = name.substring(BOT_IDENTIFIER.length).toIntOrNull()
+            Log.d("IDTEMP", idTemp.toString())
+            this.setID(idTemp)
+        }
         this.device = device
     }
 
@@ -50,8 +58,9 @@ class BattleBot {
         device = dev
     }
 
-    fun setID(id : Int){
-        this.id = id
+    fun setID(id : Int?){
+        Log.d("IDSET", "using $id")
+        this.id = id ?: -1
     }
 
     fun hasBluetoothDevice() : Boolean {
@@ -66,63 +75,45 @@ class BattleBot {
         return device
     }
 
-    fun retrieveID() : Boolean {
-        if (device != null){
-            try {
-                if(bluetoothSocket == null){
-                    //Initialize the socket
-                    bluetoothSocket = device?.createRfcommSocketToServiceRecord(BATTLEBOT_UUID)
-                }
-                if(!bluetoothSocket?.isConnected!!){
-                    bluetoothSocket?.connect()
-                    outStream = bluetoothSocket?.outputStream
-                    inStream = bluetoothSocket?.inputStream
-                    if(inStream != null && outStream != null) {
-                        inStreamReader = BufferedReader(InputStreamReader(inStream!!))
-                        outStreamWriter = BufferedWriter(OutputStreamWriter(outStream!!))
-                    }
-                }
-                //Sock is now connected
-                if(inStream != null && outStream != null){
-                    outStreamWriter?.write("DEVIDREQ\n")
-                    var success = false
-                    var resp = inStreamReader?.readLine()
-                    var tempId = resp?.toIntOrNull()
-                    var timeout = 20 //number of messages to parse before dc
-                    while(tempId == null && timeout > 0){
-                        resp = inStreamReader?.readLine()
-                        tempId = resp?.toIntOrNull()
-                        timeout--
-                    }
-                    if(timeout > 0) {
-                        success = true
-                        id = tempId!!
-                    }
-                    try {
-                        inStreamReader?.close()
-                        outStreamWriter?.close()
-                        bluetoothSocket?.close()
-                    }finally {
-                        return success
-                    }
-                }
-            }
-            catch (ex : Exception){
+    fun connect() : Boolean{
+        if(bluetoothSocket == null && device != null){
+            bluetoothSocket = device!!.createRfcommSocketToServiceRecord(BATTLEBOT_UUID)
+            if(bluetoothSocket == null)
                 return false
+        }
+        else if(device == null)
+            return false
+        try{bluetoothSocket!!.connect()}
+        catch(ex : Exception){
+            ex.printStackTrace()
+            return false
+        }
+        if(bluetoothSocket!!.isConnected) {
+            inStreamReader = BufferedReader(bluetoothSocket!!.inputStream.reader())
+            outStreamWriter = BufferedWriter(bluetoothSocket!!.outputStream.writer())
+            try {
+                Log.i("Recv BLUETOOTH", "GOT: ${inStreamReader!!.readLine()}")
+                val msg = ByteArray(1024)
+                strToByteArr("Hello, world!", msg)
+                bluetoothSocket!!.outputStream.write(msg)
             }
+            catch (ex : Exception){ return false }
+            return true
         }
         return false
     }
 
-    fun connect(){
-        if(bluetoothSocket == null){
-            throw Exception("No socket has been created!")
+    private fun strToByteArr(str : String, arr : ByteArray){
+        var i = 0;
+        while(i < str.length){
+            arr[i] = str.get(i).toByte()
+            i++
         }
-        bluetoothSocket!!.connect()
-        inStreamReader = BufferedReader(bluetoothSocket!!.inputStream.reader())
-        outStreamWriter = BufferedWriter(bluetoothSocket!!.outputStream.writer())
-        outStreamWriter!!.write("HELLO")
-        bluetoothSocket!!.close()
+        arr[str.length] = 0.toChar().toByte()
+    }
+
+    fun disconnect(){
+
     }
 
 }

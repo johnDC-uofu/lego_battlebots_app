@@ -37,6 +37,8 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
         var yPos = "0"
         var decimalPlaces = 3
         var botList : ArrayList<BattleBot> = ArrayList()
+        var deviceAddrs = ArrayList<String>()
+        var deviceNames = ArrayList<String>()
         val adapter = BluetoothAdapter.getDefaultAdapter()
         val adapterLock : Mutex = Mutex(false)
         //var mAuth: FirebaseAuth? = null
@@ -64,19 +66,16 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
                     val name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME)
                     val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)!!
                     val deviceAddr = device.address
-                    if(!deviceAddrs.contains(deviceAddr) && name == BOT_IDENTIFIER) {
+                    if(!deviceAddrs.contains(deviceAddr) && name != null && name.contains(BattleBot.BOT_IDENTIFIER)) {
                         Log.d("Scan", "Found bluetooth device: $name:$deviceAddr")
                         deviceNames.add(name)
                         deviceAddrs.add(deviceAddr)
                         //try to get bot id now
                         val bot = BattleBot(device, name)
-                        if(bot.retrieveID()){
-                            Log.d("BOTID", "Managed to get bot id!")
+                        if(!botList.contains(bot)) {
+                            botList.add(bot)
+                            Log.d("Adding Bot", "Bot has ID ${bot.getID()}")
                         }
-                        else{
-                            Log.d("BOTID", "Adding bot with -1 id...")
-                        }
-                        botList.add(bot)
                     }
                 }
                 else -> Log.d("Scan", "Got here")
@@ -87,7 +86,7 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
 
     val deviceNames = ArrayList<String>()
     val deviceAddrs = ArrayList<String>()
-    val BOT_IDENTIFIER = "raspberrypi" //Name of battlebot devices. To change with hostname
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,15 +108,11 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
             bluetoothAdapter.enable()
         }
         for(dev : BluetoothDevice in bluetoothAdapter.bondedDevices){
-            if(dev.name == BOT_IDENTIFIER) {
+            if(dev.name == BattleBot.BOT_IDENTIFIER) {
                 val bot = BattleBot(dev, dev.name)
-                botList.add(bot)
-                Log.d("Added device", "${dev.name} : ${dev.address}")
-                //Need to get bot id off main thread
-                GlobalScope.launch {
-                    adapterLock.lock()
-                    bot.retrieveID()
-                    adapterLock.unlock()
+                if(!botList.contains(bot)) {
+                    botList.add(bot)
+                    Log.d("Added device", "${dev.name} : ${dev.address}")
                 }
             }
         }
