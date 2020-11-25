@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_connection.*
 import java.util.*
@@ -53,6 +55,10 @@ class ConnectionFragment : Fragment(), View.OnClickListener  {
 
         connectBtn.visibility = View.INVISIBLE
         val botListAdapter = BattleBotAdapter(MainActivity.getBots())
+        botListView.adapter = botListAdapter
+        botListView.layoutManager = LinearLayoutManager(context)
+        botListView.addItemDecoration(DividerItemDecoration(botListView.context, DividerItemDecoration.VERTICAL))
+        botListView.invalidate()
 
         updateUserName(MainActivity.username)
     }

@@ -20,7 +20,11 @@ import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.fragment_connection.*
 import kotlinx.android.synthetic.main.play_screen.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import java.util.*
+import java.util.concurrent.locks.Lock
 import kotlin.collections.ArrayList
 
 
@@ -34,6 +38,7 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
         var decimalPlaces = 3
         var botList : ArrayList<BattleBot> = ArrayList()
         val adapter = BluetoothAdapter.getDefaultAdapter()
+        val adapterLock : Mutex = Mutex(false)
         //var mAuth: FirebaseAuth? = null
         fun getBots(): ArrayList<BattleBot> {
             return botList
@@ -61,9 +66,17 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
                     val deviceAddr = device.address
                     if(!deviceAddrs.contains(deviceAddr) && name == BOT_IDENTIFIER) {
                         Log.d("Scan", "Found bluetooth device: $name:$deviceAddr")
-                        botList.add(BattleBot(device, name))
                         deviceNames.add(name)
                         deviceAddrs.add(deviceAddr)
+                        //try to get bot id now
+                        val bot = BattleBot(device, name)
+                        if(bot.retrieveID()){
+                            Log.d("BOTID", "Managed to get bot id!")
+                        }
+                        else{
+                            Log.d("BOTID", "Adding bot with -1 id...")
+                        }
+                        botList.add(bot)
                     }
                 }
                 else -> Log.d("Scan", "Got here")
@@ -96,8 +109,17 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
             bluetoothAdapter.enable()
         }
         for(dev : BluetoothDevice in bluetoothAdapter.bondedDevices){
-            botList.add(BattleBot(dev, dev.name))
-            Log.d("Added device", "${dev.name} : ${dev.address}")
+            if(dev.name == BOT_IDENTIFIER) {
+                val bot = BattleBot(dev, dev.name)
+                botList.add(bot)
+                Log.d("Added device", "${dev.name} : ${dev.address}")
+                //Need to get bot id off main thread
+                GlobalScope.launch {
+                    adapterLock.lock()
+                    bot.retrieveID()
+                    adapterLock.unlock()
+                }
+            }
         }
         bluetoothAdapter.startDiscovery()
         this.supportActionBar!!.hide()

@@ -34,11 +34,8 @@ class BattleBotAdapter(private val mBattleBots : List<BattleBot>) : RecyclerView
         val battleBot = mBattleBots[position]
         val textView = holder.deviceString
         textView.text = "Battle Bot Id: ${battleBot.getID()}"
-        textView.setTextColor(0x000FF7)
         val button = holder.selectButton
-        button.setBackgroundColor(0x000FF7)
         button.text = "Select!"
-
         button.isEnabled = true
     }
 }

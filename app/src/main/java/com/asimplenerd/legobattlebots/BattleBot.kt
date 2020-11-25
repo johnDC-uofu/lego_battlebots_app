@@ -70,10 +70,27 @@ class BattleBot {
                 }
                 //Sock is now connected
                 if(inStream != null && outStream != null){
-                    outStreamWriter?.write("DEVIDREQ")
+                    outStreamWriter?.write("DEVIDREQ\n")
+                    var success = false
                     var resp = inStreamReader?.readLine()
-                    id = resp?.toInt()!!
-                    return true
+                    var tempId = resp?.toIntOrNull()
+                    var timeout = 20 //number of messages to parse before dc
+                    while(tempId == null && timeout > 0){
+                        resp = inStreamReader?.readLine()
+                        tempId = resp?.toIntOrNull()
+                        timeout--
+                    }
+                    if(timeout > 0) {
+                        success = true
+                        id = tempId!!
+                    }
+                    try {
+                        inStreamReader?.close()
+                        outStreamWriter?.close()
+                        bluetoothSocket?.close()
+                    }finally {
+                        return success
+                    }
                 }
             }
             catch (ex : Exception){
