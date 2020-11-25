@@ -86,6 +86,8 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
     }
 
     fun gameOver(){
+        //Disconnect from the bot
+        ConnectionFragment.battleBot?.disconnect()
         val fragMan = this.parentFragmentManager
         fragMan.beginTransaction().replace(R.id.interactionFragment, GameOverFragment()).addToBackStack("Welcome").commit()
     }
@@ -107,7 +109,7 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
             //Log.d("Updated", "armor; ")
             try {
 
-                fromBluetooth()
+                //fromBluetooth()
 
 
 

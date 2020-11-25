@@ -83,7 +83,7 @@ class BattleBot {
         }
         else if(device == null)
             return false
-        try{bluetoothSocket!!.connect()}
+        try{bluetoothSocket?.connect()}
         catch(ex : Exception){
             ex.printStackTrace()
             return false
@@ -113,7 +113,12 @@ class BattleBot {
     }
 
     fun disconnect(){
-
+        if(bluetoothSocket?.isConnected!!) {
+            inStream?.close()
+            outStream?.close()
+            bluetoothSocket?.close()
+            this.bluetoothSocket = null
+        }
     }
 
 }

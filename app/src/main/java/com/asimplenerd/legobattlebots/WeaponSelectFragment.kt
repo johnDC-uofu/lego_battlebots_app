@@ -110,6 +110,8 @@ class WeaponSelectFragment : Fragment(), View.OnClickListener  {
     }
 
     fun goBackFrag(){
+        ConnectionFragment.battleBot?.disconnect()
+        MainActivity.startScan()
         val fragMan = this.parentFragmentManager
         fragMan.beginTransaction().replace(R.id.interactionFragment, ConnectionFragment()).addToBackStack("Welcome").commit()
     }
