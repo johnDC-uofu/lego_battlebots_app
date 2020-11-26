@@ -87,7 +87,7 @@ class WeaponSelectFragment : Fragment(), View.OnClickListener  {
 
     private fun showGameFrag(){
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, Game(attackId!!)).addToBackStack("Game").commit()
+        fragMan.beginTransaction().replace(R.id.interactionFragment, Game()).addToBackStack("Game").commit()
     }
 
     private fun goBackFrag(){

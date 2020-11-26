@@ -1,35 +1,30 @@
 package com.asimplenerd.legobattlebots
 
-import android.os.Build
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.os.VibrationEffect
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import com.asimplenerd.legobattlebots.WeaponSelectFragment.Companion.attackId
 import kotlinx.android.synthetic.main.play_screen.*
 
-class Game(attackId: String) : Fragment(), View.OnTouchListener {
+class Game : Fragment(), View.OnTouchListener {
 
     companion object {
 
-        val MAX_ARMOR_LEVEL = 3
-        val botId = ConnectionFragment.botId
-        var joystickPosX = "0"
-        var joystickPosY = "0"
+        const val MAX_ARMOR_LEVEL = 3
         var attacks = 0
         var armor = MAX_ARMOR_LEVEL
 
     }
 
 
-    val armorLoop = GameLoop(this, 100)
-    val outputLoop = GameLoop(this, 10)
+    private val armorLoop = GameLoop(this, 100)
+    private val outputLoop = GameLoop(this, 10)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +39,7 @@ class Game(attackId: String) : Fragment(), View.OnTouchListener {
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 
         speedBar.progress = 0
@@ -56,32 +52,32 @@ class Game(attackId: String) : Fragment(), View.OnTouchListener {
 
         updateUserName(MainActivity.username)
 
-        updatebotId(ConnectionFragment.botId)
+        updateBotId(ConnectionFragment.botId)
         armorLoop.startLoop(false)
         outputLoop.startLoop(true)
     }
 
-    fun updateUserName(name : String)
+    private fun updateUserName(name : String)
     {
-        loggedInText2.text = "Logged in as: " + name
+        loggedInText2.text = getString(R.string.logged_in_user, name)
     }
 
-    fun updatebotId(id : String)
+    private fun updateBotId(id : String)
     {
-        botName.text = "Connected to bot: " + id
+        botName.text = getString(R.string.bot_connected, id)
     }
 
 
-    fun mainAttack(){
-        attacks += 1
-        ConnectionFragment.battleBot?.sendDataToBot("primary: start")
-    }
+//    fun mainAttack(){
+//        attacks += 1
+//        ConnectionFragment.battleBot?.sendDataToBot("primary: start")
+//    }
+//
+//    fun sideAttack(){
+//        ConnectionFragment.battleBot?.sendDataToBot("secondary: start")
+//    }
 
-    fun sideAttack(){
-        ConnectionFragment.battleBot?.sendDataToBot("secondary: start")
-    }
-
-    fun gameOver(){
+    private fun gameOver(){
         //Disconnect from the bot
         ConnectionFragment.battleBot?.disconnect()
         val fragMan = this.parentFragmentManager
@@ -96,7 +92,7 @@ class Game(attackId: String) : Fragment(), View.OnTouchListener {
             try {
                 attacks = 0
             } catch (e: Exception) {
-                outputLoop.endLoop();
+                outputLoop.endLoop()
                 e.printStackTrace()
             }
         }
@@ -120,7 +116,7 @@ class Game(attackId: String) : Fragment(), View.OnTouchListener {
                     outputLoop.endLoop()
                 }
             } catch (e: Exception) {
-                armorLoop.endLoop();
+                armorLoop.endLoop()
                 e.printStackTrace()
             }
         }
