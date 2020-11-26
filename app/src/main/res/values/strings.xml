@@ -19,4 +19,5 @@
     <string name="connecting_text">Connecting to BattleBot…</string>
     <string name="logged_in_user">Logged in as: %1$s</string>
     <string name="bot_selected">Bot Selected: %1$s</string>
+    <string name="weapon_selected">Weapon Selected: %1$s</string>
 </resources>

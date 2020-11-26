@@ -1,29 +1,13 @@
 package com.asimplenerd.legobattlebots
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.bluetooth.le.*
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import android.os.ParcelUuid
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.Button
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
-import kotlinx.android.synthetic.main.fragment_connection.*
+import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_connection.loggedInText3
-import kotlinx.android.synthetic.main.fragment_welcome.*
 import kotlinx.android.synthetic.main.select_weapon.*
-import java.util.*
 
 /**
  * A simple [Fragment] subclass.
@@ -42,9 +26,6 @@ class WeaponSelectFragment : Fragment(), View.OnClickListener  {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.select_weapon, container, false)
-        val manager = activity!!.applicationContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val adapter = manager.adapter
-        //adapter.startDiscovery()
         return view
     }
 
@@ -88,28 +69,28 @@ class WeaponSelectFragment : Fragment(), View.OnClickListener  {
     }
 
 
-    fun updateUserName(name : String)
+    private fun updateUserName(name : String)
     {
-        loggedInText3.text = "Logged in as: " + name
+        loggedInText3.text = getString(R.string.logged_in_user, name)
     }
 
-    fun selectWeapon(weaponName : String)
+    private fun selectWeapon(weaponName : String)
     {
         attackId = weaponName
         goBattleBtn.setOnClickListener(this)
-        weaponSelectedText.text = "Weapon Selected: $weaponName"
+        weaponSelectedText.text = getString(R.string.weapon_selected, weaponName)
         goBattleBtn.visibility = View.VISIBLE
         ConnectionFragment.battleBot?.setWeapon(weaponName)
     }
 
 
 
-    fun showGameFrag(){
+    private fun showGameFrag(){
         val fragMan = this.parentFragmentManager
         fragMan.beginTransaction().replace(R.id.interactionFragment, Game(attackId!!)).addToBackStack("Game").commit()
     }
 
-    fun goBackFrag(){
+    private fun goBackFrag(){
         ConnectionFragment.battleBot?.disconnect()
         MainActivity.startScan()
         val fragMan = this.parentFragmentManager
