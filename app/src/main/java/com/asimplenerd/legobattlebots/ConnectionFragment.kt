@@ -1,21 +1,14 @@
 package com.asimplenerd.legobattlebots
 
 import android.app.AlertDialog
-import android.app.Dialog
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.content.Context
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,7 +16,6 @@ import kotlinx.android.synthetic.main.fragment_connection.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
-import java.util.logging.Logger
 
 /**
  * A simple [Fragment] subclass.
@@ -31,7 +23,7 @@ import java.util.logging.Logger
  * create an instance of this fragment.
  */
 
-public val BATTLEBOT_UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee")
+val BATTLEBOT_UUID: UUID = UUID.fromString("94f39d29-7d6d-437d-973b-fba39e49d4ee")
 
 class ConnectionFragment : Fragment(), View.OnClickListener{
 
@@ -46,11 +38,7 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
         ): View? {
-            val view = inflater.inflate(R.layout.fragment_connection, container, false)
-            val manager = activity!!.applicationContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-            val adapter = manager.adapter
-            //adapter.startDiscovery()
-            return view
+            return inflater.inflate(R.layout.fragment_connection, container, false)
         }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -59,7 +47,6 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
         val goBackBtn = this.view!!.findViewById<Button>(R.id.goBackBtn)
         val botListView = this.view!!.findViewById<RecyclerView>(R.id.availableBattleBotsList)
 
-        val connectionSpinner = layoutInflater.inflate(R.layout.connection_dialog, null)
         recycler = botListView
         goBackBtn.setOnClickListener(this)
 
@@ -111,26 +98,26 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
     }
 
 
-    fun updateUserName(name : String)
+    private fun updateUserName(name : String)
     {
-        loggedInText3.text = "Logged in as: $name"
+        loggedInText3.text = getString(R.string.logged_in_user, name)
     }
 
     fun selectBot(bot : BattleBot){
         botId = bot.getID().toString()
         battleBot = bot
         connectBtn.setOnClickListener(this)
-        botSelectedText.text = "Bot Selected: $botId"
+        botSelectedText.text = getString(R.string.bot_selected, botId)
         Log.i("DEV", "${bot.getDevice()?.address}")
         connectBtn.visibility = View.VISIBLE
     }
 
-    fun showWeaponsFrag(){
+    private fun showWeaponsFrag(){
         val fragMan = this.parentFragmentManager
         fragMan.beginTransaction().replace(R.id.interactionFragment, WeaponSelectFragment()).addToBackStack("Game").commit()
     }
 
-    fun showMenuFrag(){
+    private fun showMenuFrag(){
         val fragMan = this.parentFragmentManager
         fragMan.beginTransaction().replace(R.id.interactionFragment, WelcomeFragment()).addToBackStack("Welcome").commit()
     }
