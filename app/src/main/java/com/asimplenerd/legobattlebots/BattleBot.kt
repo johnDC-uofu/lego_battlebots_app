@@ -2,7 +2,11 @@ package com.asimplenerd.legobattlebots
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import android.os.CountDownTimer
 import android.util.Log
+import com.google.android.gms.tasks.Task
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.*
 import java.lang.Exception
 import java.util.*
@@ -17,6 +21,26 @@ class BattleBot {
     private var outStreamWriter : BufferedWriter? = null
     private var name : String = "BattleBot"
     private var weapon : String = "Sword"
+    private var isConnected = false
+    private var isInBattle = false
+    private var health = 1.0
+    private var armorCount = 0
+    private var timer = object : CountDownTimer(10000, 100){
+
+        override fun onTick(millisUntilFinished: Long) {
+            if(bluetoothSocket?.isConnected!!){
+                this.onFinish()
+            }
+        }
+
+        override fun onFinish() {
+            isConnected = bluetoothSocket?.isConnected!!
+            if(!isConnected){
+                bluetoothSocket?.close() //Not connected within the time limit.
+            }
+        }
+
+    }
 
     companion object{
         val BOT_IDENTIFIER = "BattleBot"
@@ -83,12 +107,16 @@ class BattleBot {
         }
         else if(device == null)
             return false
-        try{bluetoothSocket?.connect()}
+        try{
+            timer.start()
+            bluetoothSocket?.connect()
+            timer.cancel()
+        }
         catch(ex : Exception){
             ex.printStackTrace()
             return false
         }
-        if(bluetoothSocket!!.isConnected) {
+        if(this.isConnected) {
             inStreamReader = BufferedReader(bluetoothSocket!!.inputStream.reader())
             outStreamWriter = BufferedWriter(bluetoothSocket!!.outputStream.writer())
             try {
@@ -96,11 +124,47 @@ class BattleBot {
                 val msg = ByteArray(1024)
                 strToByteArr("Hello, world!", msg)
                 bluetoothSocket!!.outputStream.write(msg)
+                readDataFromBluetooth()
             }
             catch (ex : Exception){ return false }
             return true
         }
         return false
+    }
+
+    fun readDataFromBluetooth() {
+        GlobalScope.launch {
+            while (isConnected && inStreamReader != null) {
+                try {
+                    val updateData = inStreamReader!!.readLine().trim().split(' ')
+                    when (updateData[0]) {
+                        "ArmorStatus:" -> {
+                            Log.i("ARMOR", "received update")
+                            val armorList = updateData[1].split(':')
+
+                            var tempHealth = (armorList[0].toInt() + armorList[1].toInt() + armorList[2].toInt()) / 3.0
+                            if(!isInBattle || (isInBattle && tempHealth < health)) {
+                                health = tempHealth
+                                Log.d("HealthChange", "Health set to $health")
+                            }
+                        }
+                        else -> {
+                            Log.i("INFO", "${updateData[0]}")
+                        }
+                    }
+                }catch(ex : Exception){
+                    break //Client lost connection
+                }
+            }
+        }
+    }
+
+    fun enterCombat(){
+        this.isInBattle = true
+    }
+
+    fun exitCombat(){
+        this.isInBattle = false
     }
 
     private fun strToByteArr(str : String, arr : ByteArray){
@@ -112,11 +176,17 @@ class BattleBot {
         arr[str.length] = 0.toChar().toByte()
     }
 
+    fun getRemainingHealthPercentage() : Double{
+        return health
+    }
+
     fun disconnect(){
         if(bluetoothSocket?.isConnected!!) {
             inStream?.close()
             outStream?.close()
-            bluetoothSocket?.close()
+            inStreamReader?.close()
+            outStreamWriter?.close()
+            bluetoothSocket!!.close()
             this.bluetoothSocket = null
         }
     }

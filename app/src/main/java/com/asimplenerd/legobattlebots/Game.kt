@@ -36,7 +36,7 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
     ): View? {
 
 
-        Log.d("Right Joystick", "got here: ");
+        ConnectionFragment.battleBot?.enterCombat()
 
 
         return inflater.inflate(R.layout.play_screen, container, false)
@@ -109,15 +109,15 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
             //Log.d("Updated", "armor; ")
             try {
 
-                //fromBluetooth()
 
 
 
-                val percent = armor.toFloat() / MAX_ARMOR_LEVEL.toFloat() * 100.0F
+
+                val percent = ConnectionFragment.battleBot!!.getRemainingHealthPercentage() * 100.0
                 Log.d("Percent: ", percent.toString())
                 hpBar.progress = percent.toInt()
 
-                if (hpBar.progress == 0) {
+                if (hpBar.progress <= 0) {
                     gameOver()
                     hpBar.progress = 100
                     armor = MAX_ARMOR_LEVEL

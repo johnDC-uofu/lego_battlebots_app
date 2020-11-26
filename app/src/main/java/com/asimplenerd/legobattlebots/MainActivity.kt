@@ -164,6 +164,13 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
         return "%.${n}f".format(this).toFloat()
     }
 
+    override fun onStop() {
+        //ConnectionFragment.battleBot?.disconnect()
+        unregisterReceiver(this.scanReceiver)
+        Log.d("Killing", " app closed")
+        super.onStop()
+    }
+
     override fun onJoystickMoved(
         xPercent: Float,
         yPercent: Float,

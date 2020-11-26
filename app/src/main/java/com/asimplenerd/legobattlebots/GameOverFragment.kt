@@ -29,6 +29,7 @@ class GameOverFragment : Fragment(), View.OnClickListener {
         playAgainBtn.setOnClickListener(this)
         menuBtn.setOnClickListener(this)
 
+        ConnectionFragment.battleBot?.exitCombat()
 
         updateUserName(MainActivity.username)
     }
