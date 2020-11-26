@@ -25,8 +25,7 @@ class WeaponSelectFragment : Fragment(), View.OnClickListener  {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.select_weapon, container, false)
-        return view
+        return inflater.inflate(R.layout.select_weapon, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

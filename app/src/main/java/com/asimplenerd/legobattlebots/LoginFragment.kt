@@ -15,7 +15,6 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.fragment_welcome.*
 import kotlinx.android.synthetic.main.login_fragment.*
 
 
@@ -24,10 +23,6 @@ class LoginFragment : Fragment(), View.OnClickListener {
     private lateinit var database: DatabaseReference
 
     private lateinit var auth: FirebaseAuth
-
-    companion object {
-        fun newInstance() = LoginFragment()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,16 +35,16 @@ class LoginFragment : Fragment(), View.OnClickListener {
         return inflater.inflate(R.layout.login_fragment, container, false)
     }
 
-    public override fun onStart() {
+    override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
         updateUI(currentUser)
     }
 
-    fun updateUI(currentUser :FirebaseUser?)
+    private fun updateUI(currentUser :FirebaseUser?)
     {
-
+        Log.d("CURRUSR", currentUser.toString())
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -75,13 +70,13 @@ class LoginFragment : Fragment(), View.OnClickListener {
         database.child("users").child(userId).child("email").child("password").child("wins").child("losses").setValue(user)
     }
 
-    fun goBack(){
+    private fun goBack(){
 
         val fragMan = this.parentFragmentManager
         fragMan.beginTransaction().replace(R.id.interactionFragment, WelcomeFragment()).addToBackStack("Welcome").commit()
     }
 
-    fun registerUser()
+   private fun registerUser()
     {
         if(emailInput.text.isEmpty()){
             emailInput.error = "Please enter email"
@@ -106,7 +101,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
         else
         {
             auth.createUserWithEmailAndPassword(emailInput.text.toString(), passwordInput.text.toString())
-                .addOnCompleteListener() { task ->
+                .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "createUserWithEmail:success")
@@ -139,7 +134,8 @@ class LoginFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    fun loginUser()
+    @Suppress("SameParameterValue")
+    private fun loginUser()
     {
 
         if(emailInput.text.isEmpty()){
@@ -165,11 +161,10 @@ class LoginFragment : Fragment(), View.OnClickListener {
         else
         {
             auth.signInWithEmailAndPassword(emailInput.text.toString(), passwordInput.text.toString())
-                .addOnCompleteListener() { task ->
+                .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success")
-                            val user: FirebaseUser? = auth.getCurrentUser()
                             //updateUI(user)
 
                             MainActivity.username = emailInput.text.toString()

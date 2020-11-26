@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">LEGO BattleBots</string>
     <string name="login">Login</string>
+    <string name="logout">Logout</string>
     <string name="battle">Battle!</string>
     <string name="register">Register</string>
     <string name="email">Email: </string>

@@ -1,10 +1,7 @@
 package com.asimplenerd.legobattlebots
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -18,7 +15,6 @@ import kotlinx.android.synthetic.main.fragment_welcome.*
 class WelcomeFragment : Fragment(), View.OnClickListener {
 
     companion object {
-        fun newInstance() = WelcomeFragment()
         var loggedIn = false
         //val vibe = this.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
     }
@@ -41,11 +37,11 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
 
         if(MainActivity.username.isEmpty())
         {
-            loginBtn.text = "Login"
+            loginBtn.text = getText(R.string.login)
         }
         else {
             loggedIn = true
-            loginBtn.text = "Logout"
+            loginBtn.text = getText(R.string.logout)
         }
 
         updateUserName(MainActivity.username)
@@ -56,7 +52,7 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
         buttonEffect(v)
        // vibe.vibrate(80)
         //vibe.vibrate(VibrationEffect.createOneShot(80L,1))
-        when(v?.id){
+        when(v.id){
             R.id.battleBtn -> showConnectionFrag()
             R.id.loginBtn -> showLoginFrag()
            // R.id.connectBtn -> showGameFrag()
@@ -66,10 +62,10 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
 
     fun updateUserName(name : String)
     {
-        loggedInText.text = "Logged in as: " + name
+        loggedInText.text = getString(R.string.logged_in_user, name)
     }
 
-    fun showConnectionFrag(){
+    private fun showConnectionFrag(){
         //Stop scanning for new devices as we will need the list now
         val fragMan = this.parentFragmentManager
         fragMan.beginTransaction().replace(R.id.interactionFragment, ConnectionFragment()).addToBackStack("Connect").commit()
@@ -80,12 +76,12 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
 //        fragMan.beginTransaction().replace(R.id.interactionFragment, Game()).addToBackStack("Game").commit()
 //    }
 
-    fun showLoginFrag(){
+    private fun showLoginFrag(){
         if(loggedIn)
         {
             MainActivity.username = ""
             updateUserName(MainActivity.username)
-            loginBtn.text = "Login"
+            loginBtn.text = getText(R.string.login)
             loggedIn = false
         }
         else {
@@ -95,7 +91,7 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    fun buttonEffect(button: View) {
+    private fun buttonEffect(button: View) {
         button.setOnTouchListener { v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -107,6 +103,7 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
                     v.invalidate()
                 }
             }
+            v.performClick()
             false
         }
     }
