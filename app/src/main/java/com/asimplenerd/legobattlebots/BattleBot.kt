@@ -2,18 +2,18 @@ package com.asimplenerd.legobattlebots
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
-import android.os.CountDownTimer
 import android.util.Log
-import com.google.android.gms.tasks.Task
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.*
-import java.lang.Exception
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.*
 
-class BattleBot {
+class BattleBot(device: BluetoothDevice, name: String?) {
     private var id : Int = -1
-    private var device : BluetoothDevice? = null
+    private var device : BluetoothDevice? = device
     private var bluetoothSocket : BluetoothSocket? = null
     private var outStream : OutputStream? = null
     private var inStream : InputStream? = null
@@ -24,50 +24,17 @@ class BattleBot {
     private var isConnected = false
     private var isInBattle = false
     private var health = 1.0
-    private var armorCount = 0
-    private var timer = object : CountDownTimer(10000, 100){
-
-        override fun onTick(millisUntilFinished: Long) {
-            if(bluetoothSocket?.isConnected!!){
-                this.onFinish()
-            }
-        }
-
-        override fun onFinish() {
-            isConnected = bluetoothSocket?.isConnected!!
-            if(!isConnected){
-                bluetoothSocket?.close() //Not connected within the time limit.
-            }
-        }
-
-    }
 
     companion object{
-        val BOT_IDENTIFIER = "BattleBot"
+        const val BOT_IDENTIFIER = "BattleBot"
     }
 
-    constructor(id : Int){
-        this.id = id
-        device = null
-    }
-
-    constructor(id : Int, device: BluetoothDevice){
-        this.id = id
-        this.device = device
-    }
-
-    constructor(device: BluetoothDevice, name : String?){
+    init {
         if(name != null) {
             this.name = name
             val idTemp = name.substring(BOT_IDENTIFIER.length).toIntOrNull()
-            Log.d("IDTEMP", idTemp.toString())
             this.setID(idTemp)
         }
-        this.device = device
-    }
-
-    fun setName(name : String){
-        this.name = name
     }
 
     fun setWeapon(type : String){
@@ -79,17 +46,9 @@ class BattleBot {
         sendDataToBot("weapon: ${this.weapon}")
     }
 
-    fun setBluetoothDevice(dev : BluetoothDevice){
-        device = dev
-    }
-
-    fun setID(id : Int?){
+    private fun setID(id : Int?){
         Log.d("IDSET", "using $id")
         this.id = id ?: -1
-    }
-
-    fun hasBluetoothDevice() : Boolean {
-        return device == null
     }
 
     fun getID() : Int{
@@ -135,7 +94,7 @@ class BattleBot {
         return false
     }
 
-    fun readDataFromBluetooth() {
+    private fun readDataFromBluetooth() {
         GlobalScope.launch {
             while (bluetoothSocket!!.isConnected && inStreamReader != null) {
                 try {
@@ -145,14 +104,14 @@ class BattleBot {
                             Log.i("ARMOR", "received update")
                             val armorList = updateData[1].split(':')
 
-                            var tempHealth = (armorList[0].toInt() + armorList[1].toInt() + armorList[2].toInt()) / 3.0
+                            val tempHealth = (armorList[0].toInt() + armorList[1].toInt() + armorList[2].toInt()) / 3.0
                             if(!isInBattle || (isInBattle && tempHealth < health)) {
                                 health = tempHealth
                                 Log.d("HealthChange", "Health set to $health")
                             }
                         }
                         else -> {
-                            Log.i("INFO", "${updateData[0]}")
+                            Log.i("INFO", updateData[0])
                         }
                     }
                 }catch(ex : Exception){
@@ -167,10 +126,13 @@ class BattleBot {
     }
 
     fun sendDataToBot(data : String){
+        val msg = ByteArray(256)
         GlobalScope.launch {
             if (outStream != null) {
-                val msg = ByteArray(256)
                 strToByteArr(data, msg)
+            }
+        }.invokeOnCompletion {
+            if(msg.isNotEmpty()){
                 outStream?.write(msg)
             }
         }
@@ -185,9 +147,9 @@ class BattleBot {
     }
 
     private fun strToByteArr(str : String, arr : ByteArray){
-        var i = 0;
+        var i = 0
         while(i < str.length){
-            arr[i] = str.get(i).toByte()
+            arr[i] = str[i].toByte()
             i++
         }
         arr[str.length] = 0.toChar().toByte()

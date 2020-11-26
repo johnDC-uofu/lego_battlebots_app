@@ -20,5 +20,6 @@
     <string name="logged_in_user">Logged in as: %1$s</string>
     <string name="bot_connected">Connected to Bot: %1$s</string>
     <string name="bot_selected">Bot Selected: %1$s</string>
+    <string name="bot_id">Battle Bot Id: %1$d</string>
     <string name="weapon_selected">Weapon Selected: %1$s</string>
 </resources>
