@@ -2,8 +2,8 @@ package com.asimplenerd.legobattlebots;
 
 public class GameLoop extends Thread {
 
-    private Game game;
-    private int latency;
+    private final Game game;
+    private final int latency;
     private boolean isRunning = false;
     private boolean isOutput =  false;
 
@@ -19,6 +19,7 @@ public class GameLoop extends Thread {
         start();
     }
 
+    @SuppressWarnings("BusyWait")
     public void run() {
         super.run();
 

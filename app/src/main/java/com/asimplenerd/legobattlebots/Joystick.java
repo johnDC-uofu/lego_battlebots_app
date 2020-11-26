@@ -4,19 +4,13 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PorterDuff;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
-import org.jetbrains.annotations.NotNull;
-
-import static android.graphics.PorterDuff.*;
-import static android.graphics.PorterDuff.Mode.*;
+import static android.graphics.PorterDuff.Mode.CLEAR;
 
 public class Joystick extends SurfaceView implements SurfaceHolder.Callback, View.OnTouchListener
 {
@@ -25,14 +19,13 @@ public class Joystick extends SurfaceView implements SurfaceHolder.Callback, Vie
     private float baseRadius;
     private float hatRadius;
     public JoystickListener joystickCallback;
-    private final int ratio = 5; //The smaller, the more shading will occur
 
     private void setupDimensions()
     {
-    centerX = getWidth() / 2;
-    centerY = getHeight() / 2;
-    baseRadius = Math.min(getWidth(), getHeight()) / 3;
-    hatRadius = Math.min(getWidth(), getHeight()) / 5;
+    centerX = getWidth() / 2.0f;
+    centerY = getHeight() / 2.0f;
+    baseRadius = Math.min(getWidth(), getHeight()) / 3.0f;
+    hatRadius = Math.min(getWidth(), getHeight()) / 5.0f;
 }
 
     public Joystick(Context context)
@@ -81,11 +74,13 @@ public class Joystick extends SurfaceView implements SurfaceHolder.Callback, Vie
             //Draw the base first before shading
             colors.setARGB(255, 100, 100, 100);
             myCanvas.drawCircle(centerX, centerY, baseRadius, colors);
+            //The smaller, the more shading will occur
+            int ratio = 5;
             for(int i = 1; i <= (int) (baseRadius / ratio); i++)
             {
                 colors.setARGB(150/i, 255, 0, 0); //Gradually decrease the shade of black drawn to create a nice shading effect
-                myCanvas.drawCircle(newX - cos * hypotenuse * (ratio/baseRadius) * i,
-                        newY - sin * hypotenuse * (ratio/baseRadius) * i, i * (hatRadius * ratio / baseRadius), colors); //Gradually increase the size of the shading effect
+                myCanvas.drawCircle(newX - cos * hypotenuse * (ratio /baseRadius) * i,
+                        newY - sin * hypotenuse * (ratio /baseRadius) * i, i * (hatRadius * ratio / baseRadius), colors); //Gradually increase the size of the shading effect
             }
 
             //Drawing the joystick hat
@@ -120,7 +115,7 @@ public class Joystick extends SurfaceView implements SurfaceHolder.Callback, Vie
     {
         if(v.equals(this))
         {
-            if(e.getAction() != e.ACTION_UP)
+            if(e.getAction() != MotionEvent.ACTION_UP)
             {
                 float displacement = (float) Math.sqrt((Math.pow(e.getX() - centerX, 2)) + Math.pow(e.getY() - centerY, 2));
                 if(displacement < baseRadius)
