@@ -1,5 +1,7 @@
 package com.asimplenerd.legobattlebots
 
+import android.app.AlertDialog
+import android.app.Dialog
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.Context
@@ -12,6 +14,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -55,6 +58,8 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
         val connectBtn = this.view!!.findViewById<Button>(R.id.connectBtn)
         val goBackBtn = this.view!!.findViewById<Button>(R.id.goBackBtn)
         val botListView = this.view!!.findViewById<RecyclerView>(R.id.availableBattleBotsList)
+
+        val connectionSpinner = layoutInflater.inflate(R.layout.connection_dialog, null)
         recycler = botListView
         goBackBtn.setOnClickListener(this)
 
@@ -76,18 +81,27 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
         when(v?.id){
             R.id.connectBtn -> {
                     v.isEnabled = false
-                    if (battleBot != null && battleBot!!.connect()) {
-                        //Stop adapter scan for faster connection
-                            MainActivity.stopScan()
+                    val dialog = AlertDialog.Builder(context)
+                    val connectionSpinner = layoutInflater.inflate(R.layout.connection_dialog, null)
+                    val alert = dialog.setView(connectionSpinner).setCancelable(false).show()
+                    GlobalScope.launch {
+                        MainActivity.stopScan()
+
+                        if (battleBot != null && battleBot!!.connect()) {
+                            //Stop adapter scan for faster connection
+                            //connWheel.visibility = View.GONE
                             showWeaponsFrag()
+                        } else {
+                            //connWheel.visibility = View.GONE
+                            Toast.makeText(
+                                context,
+                                "FAILED TO CONNECT TO BOT WITH ID: $botId",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }.invokeOnCompletion {
+                        alert.cancel()
                     }
-                    else
-                        Toast.makeText(
-                            context,
-                            "FAILED TO CONNECT TO BOT WITH ID: $botId",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        v.isEnabled = true
             }
             R.id.goBackBtn -> showMenuFrag()
 

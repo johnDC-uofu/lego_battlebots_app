@@ -16,4 +16,5 @@
     <string name="attack_2">Attack 2</string>
     <!-- Layout Strings -->
     <string name="select">Select!</string>
+    <string name="connecting_text">Connecting to BattleBot…</string>
 </resources>
