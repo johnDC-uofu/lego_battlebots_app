@@ -6,14 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.fragment_welcome.*
 import kotlinx.android.synthetic.main.game_over.*
 
 class GameOverFragment : Fragment(), View.OnClickListener {
-
-    companion object {
-        fun newInstance() = WelcomeFragment()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,23 +36,18 @@ class GameOverFragment : Fragment(), View.OnClickListener {
         }
     }
 
-    fun updateUserName(name : String)
+    private fun updateUserName(name : String)
     {
-        loggedInText4.text = "Logged in as: " + name
+        loggedInText4.text = getString(R.string.logged_in_user, name)
     }
 
 
-    fun showConnectionFrag(){
+    private fun showConnectionFrag(){
         val fragMan = this.parentFragmentManager
         fragMan.beginTransaction().replace(R.id.interactionFragment, ConnectionFragment()).addToBackStack("Connect").commit()
     }
-//
-//    fun showGameFrag(){
-//        val fragMan = this.parentFragmentManager
-//        fragMan.beginTransaction().replace(R.id.interactionFragment, Game()).addToBackStack("Game").commit()
-//    }
 
-    fun showWelcomeFrag(){
+    private fun showWelcomeFrag(){
         val fragMan = this.parentFragmentManager
         fragMan.beginTransaction().replace(R.id.interactionFragment, WelcomeFragment()).addToBackStack("Welcome").commit()
     }
