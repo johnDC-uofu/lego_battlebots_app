@@ -11,37 +11,18 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.PermissionChecker
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.database.ktx.getValue
-import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.fragment_connection.*
 import kotlinx.android.synthetic.main.play_screen.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import java.util.*
-import java.util.concurrent.locks.Lock
-import kotlin.collections.ArrayList
 
 
 class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
 
     companion object {
         var username = ""
-        private const val TAG = "KotlinActivity"
         var xPos = "0"
         var yPos = "0"
         var decimalPlaces = 3
         var botList : ArrayList<BattleBot> = ArrayList()
-        var deviceAddrs = ArrayList<String>()
-        var deviceNames = ArrayList<String>()
-        val adapter = BluetoothAdapter.getDefaultAdapter()
-        val adapterLock : Mutex = Mutex(false)
-        //var mAuth: FirebaseAuth? = null
+        private val adapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         fun getBots(): ArrayList<BattleBot> {
             return botList
         }
@@ -59,7 +40,7 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
         }
     }
 
-    val scanReceiver = object : BroadcastReceiver(){
+    private val scanReceiver = object : BroadcastReceiver(){
         override fun onReceive(context: Context?, intent: Intent?) {
             when(intent?.action){
                 BluetoothDevice.ACTION_FOUND -> {
@@ -95,12 +76,19 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val joystick = this.joystick
         botList = ArrayList()
-        if(PermissionChecker.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PermissionChecker.PERMISSION_GRANTED){
+        if (PermissionChecker.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PermissionChecker.PERMISSION_GRANTED
+        ) {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 1)
         }
-        if(PermissionChecker.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PermissionChecker.PERMISSION_GRANTED){
+        if (PermissionChecker.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_ADMIN
+            ) != PermissionChecker.PERMISSION_GRANTED
+        ) {
             requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_ADMIN), 2)
         }
         val filter = IntentFilter()
@@ -110,21 +98,21 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
         registerReceiver(scanReceiver, filter)
         //Ensure bluetooth adapter is enabled
-        if(!bluetoothAdapter.isEnabled){
+        if (!bluetoothAdapter.isEnabled) {
             bluetoothAdapter.enable()
         }
-        for(dev : BluetoothDevice in bluetoothAdapter.bondedDevices){
-            if(dev.name == BattleBot.BOT_IDENTIFIER) {
+        for (dev: BluetoothDevice in bluetoothAdapter.bondedDevices) {
+            if (dev.name == BattleBot.BOT_IDENTIFIER) {
                 val bot = BattleBot(dev, dev.name)
-                if(!botList.contains(bot)) {
+                if (!botList.contains(bot)) {
                     botList.add(bot)
                 }
             }
         }
         bluetoothAdapter.startDiscovery()
         this.supportActionBar!!.hide()
-        supportFragmentManager.beginTransaction().add(R.id.interactionFragment, WelcomeFragment()).commitNow()
-
+        supportFragmentManager.beginTransaction().add(R.id.interactionFragment, WelcomeFragment())
+            .commitNow()
 
 
 //        mAuth = FirebaseAuth.getInstance();
@@ -152,19 +140,8 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
 
     }
 
-    public fun getBots(): ArrayList<BattleBot> {
-        return botList
-    }
 
-//
-//    override fun onStart() {
-//        super.onStart()
-//        // Check if user is signed in (non-null) and update UI accordingly.
-//        val currentUser = mAuth!!.currentUser
-//    }
-
-
-    fun Float.roundTo(n : Int) : Float {
+    private fun Float.roundTo(n : Int) : Float {
         return "%.${n}f".format(this).toFloat()
     }
 
