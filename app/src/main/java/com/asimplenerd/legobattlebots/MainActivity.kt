@@ -79,6 +79,9 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
                         }
                     }
                 }
+                BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
+                    Log.d("Disc", "Started")
+                }
                 else -> Log.d("Scan", "Got here")
             }
         }
@@ -103,6 +106,8 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
         val filter = IntentFilter()
         val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         filter.addAction(BluetoothDevice.ACTION_FOUND)
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
         registerReceiver(scanReceiver, filter)
         //Ensure bluetooth adapter is enabled
         if(!bluetoothAdapter.isEnabled){
@@ -113,7 +118,6 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
                 val bot = BattleBot(dev, dev.name)
                 if(!botList.contains(bot)) {
                     botList.add(bot)
-                    Log.d("Added device", "${dev.name} : ${dev.address}")
                 }
             }
         }
@@ -211,6 +215,11 @@ class MainActivity : Joystick.JoystickListener, AppCompatActivity() {
         else {
             //speedValue.text = "Fast"
             speedBar.progress = 100
+        }
+
+        //If we are connected to a bot, make sure this information is sent!
+        if(ConnectionFragment.battleBot != null && ConnectionFragment.battleBot?.isConnected() == true){
+            ConnectionFragment.battleBot!!.sendDataToBot("$xPos $yPos")
         }
 
 //        if(xPercent < 0.3 || xPercent > -0.3 || yPercent < 0.3 || yPercent > -0.3)

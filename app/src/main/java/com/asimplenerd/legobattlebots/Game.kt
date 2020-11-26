@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.VibrationEffect
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -13,7 +14,7 @@ import androidx.fragment.app.Fragment
 import com.asimplenerd.legobattlebots.WeaponSelectFragment.Companion.attackId
 import kotlinx.android.synthetic.main.play_screen.*
 
-class Game(attackId: String) : Fragment(), View.OnClickListener {
+class Game(attackId: String) : Fragment(), View.OnTouchListener {
 
     companion object {
 
@@ -49,8 +50,8 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
         super.onActivityCreated(savedInstanceState)
         val attackBtn1 = this.view!!.findViewById<Button>(R.id.attackBtn1)
         val attackBtn2 = this.view!!.findViewById<Button>(R.id.attackBtn2)
-        attackBtn1.setOnClickListener(this)
-        attackBtn2.setOnClickListener(this)
+        attackBtn1.setOnTouchListener(this)
+        attackBtn2.setOnTouchListener(this)
         attackBtn1.text = attackId
 
         updateUserName(MainActivity.username)
@@ -58,13 +59,6 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
         updatebotId(ConnectionFragment.botId)
         armorLoop.startLoop(false)
         outputLoop.startLoop(true)
-    }
-
-    override fun onClick(v: View?) {
-        when(v?.id){
-            R.id.attackBtn1 -> mainAttack()
-            R.id.attackBtn2 -> sideAttack()
-        }
     }
 
     fun updateUserName(name : String)
@@ -80,9 +74,11 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
 
     fun mainAttack(){
         attacks += 1
+        ConnectionFragment.battleBot?.sendDataToBot("primary: start")
     }
 
     fun sideAttack(){
+        ConnectionFragment.battleBot?.sendDataToBot("secondary: start")
     }
 
     fun gameOver(){
@@ -98,8 +94,7 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
         {
             //Log.d("Updated", "output; ")
             try {
-                toBluetooth(MainActivity.xPos, MainActivity.yPos, attackId!!, attacks.toString())
-                attacks = 0;
+                attacks = 0
             } catch (e: Exception) {
                 outputLoop.endLoop();
                 e.printStackTrace()
@@ -131,31 +126,32 @@ class Game(attackId: String) : Fragment(), View.OnClickListener {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun fromBluetooth() {
-        //TODO : receive this data to device through bluetooth, this random armor decrement is for testing purposes only
-
-        val randomNum = (0..50).random() //1 in 50 chance the armor will be decremented every 100ms
-
-        if(randomNum == 10)
-        {
-            armor -= 1
-            //VibrationEffect.createOneShot(1000,100)
-            VibrationEffect.EFFECT_HEAVY_CLICK
+    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        when(v?.id){
+            R.id.attackBtn1 -> {
+                if(event?.action == MotionEvent.ACTION_DOWN){
+                    Log.d("Attack", "pressed")
+                    ConnectionFragment.battleBot?.sendDataToBot("primary: pressed")
+                }
+                else if(event?.action == MotionEvent.ACTION_UP){
+                    Log.d("Attack", "released")
+                    ConnectionFragment.battleBot?.sendDataToBot("primary: released")
+                }
+                return true
+            }
+            R.id.attackBtn2 -> {
+                if(event?.action == MotionEvent.ACTION_DOWN){
+                    Log.d("Secondary", "pressed")
+                    ConnectionFragment.battleBot?.sendDataToBot("secondary: pressed")
+                }
+                else if(event?.action == MotionEvent.ACTION_UP){
+                    Log.d("Secondary", "released")
+                    ConnectionFragment.battleBot?.sendDataToBot("secondary: released")
+                }
+                return true
+            }
         }
-
-        Log.d("From Bluetooth", "armor set to: " + armor)
+        v?.performClick()
+        return false
     }
-
-    fun toBluetooth(xCoord : String, yCoord : String, weapon : String, attackAmt : String){
-        //TODO : send this data to device through bluetooth
-
-
-        val data =
-            "Joystick Position: $xCoord,$yCoord /n Attack Weapon=$weapon, Amount= $attackAmt end"
-
-        Log.d("To Bluetooth", data)
-    }
-
-
 }

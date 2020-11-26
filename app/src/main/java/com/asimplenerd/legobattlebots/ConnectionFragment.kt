@@ -75,6 +75,7 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
 
         when(v?.id){
             R.id.connectBtn -> {
+                    v.isEnabled = false
                     if (battleBot != null && battleBot!!.connect()) {
                         //Stop adapter scan for faster connection
                             MainActivity.stopScan()
@@ -86,6 +87,7 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
                             "FAILED TO CONNECT TO BOT WITH ID: $botId",
                             Toast.LENGTH_LONG
                         ).show()
+                        v.isEnabled = true
             }
             R.id.goBackBtn -> showMenuFrag()
 

@@ -76,6 +76,7 @@ class BattleBot {
             "sword" -> {this.weapon = "Sword"}
             "lifter" -> {this.weapon = "Lifter"}
         }
+        sendDataToBot("weapon: ${this.weapon}")
     }
 
     fun setBluetoothDevice(dev : BluetoothDevice){
@@ -100,7 +101,7 @@ class BattleBot {
     }
 
     fun connect() : Boolean{
-        if(bluetoothSocket == null && device != null){
+        if((bluetoothSocket == null && device != null) || !isConnected){
             bluetoothSocket = device!!.createRfcommSocketToServiceRecord(BATTLEBOT_UUID)
             if(bluetoothSocket == null)
                 return false
@@ -108,17 +109,16 @@ class BattleBot {
         else if(device == null)
             return false
         try{
-            timer.start()
             bluetoothSocket?.connect()
-            timer.cancel()
         }
         catch(ex : Exception){
             ex.printStackTrace()
             return false
         }
-        if(this.isConnected) {
+        if(bluetoothSocket?.isConnected!!) {
             inStreamReader = BufferedReader(bluetoothSocket!!.inputStream.reader())
             outStreamWriter = BufferedWriter(bluetoothSocket!!.outputStream.writer())
+            outStream = bluetoothSocket!!.outputStream
             try {
                 Log.i("Recv BLUETOOTH", "GOT: ${inStreamReader!!.readLine()}")
                 val msg = ByteArray(1024)
@@ -129,12 +129,15 @@ class BattleBot {
             catch (ex : Exception){ return false }
             return true
         }
+        bluetoothSocket = null
+        outStream = null
+        inStream = null
         return false
     }
 
     fun readDataFromBluetooth() {
         GlobalScope.launch {
-            while (isConnected && inStreamReader != null) {
+            while (bluetoothSocket!!.isConnected && inStreamReader != null) {
                 try {
                     val updateData = inStreamReader!!.readLine().trim().split(' ')
                     when (updateData[0]) {
@@ -155,6 +158,20 @@ class BattleBot {
                 }catch(ex : Exception){
                     break //Client lost connection
                 }
+            }
+        }
+    }
+
+    fun isConnected() : Boolean {
+        return bluetoothSocket?.isConnected!!
+    }
+
+    fun sendDataToBot(data : String){
+        GlobalScope.launch {
+            if (outStream != null) {
+                val msg = ByteArray(256)
+                strToByteArr(data, msg)
+                outStream?.write(msg)
             }
         }
     }
