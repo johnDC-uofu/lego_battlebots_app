@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import kotlinx.android.synthetic.main.fragment_connection.loggedInText3
 import kotlinx.android.synthetic.main.select_weapon.*
 
@@ -86,14 +87,14 @@ class WeaponSelectFragment : Fragment(), View.OnClickListener  {
 
     private fun showGameFrag(){
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, Game()).addToBackStack("Game").commit()
+        fragMan.beginTransaction().replace(R.id.interactionFragment, Game()).commit()
     }
 
     private fun goBackFrag(){
         ConnectionFragment.battleBot?.disconnect()
         MainActivity.startScan()
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, ConnectionFragment()).addToBackStack("Welcome").commit()
+        fragMan.popBackStack("Connection", FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
 }

@@ -2,13 +2,11 @@ package com.asimplenerd.legobattlebots
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import android.os.CountDownTimer
 import android.util.Log
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.BufferedReader
-import java.io.BufferedWriter
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.*
 import java.util.*
 
 class BattleBot(device: BluetoothDevice, name: String?) {
@@ -24,6 +22,20 @@ class BattleBot(device: BluetoothDevice, name: String?) {
     private var isConnected = false
     private var isInBattle = false
     private var health = 1.0
+    private val timeoutMax = 10 //timeout in seconds
+    private var timeoutCountDownTimer : CountDownTimer = object : CountDownTimer((timeoutMax * 1000).toLong(), 1000){
+        override fun onTick(millisUntilFinished: Long) {
+            isConnected = bluetoothSocket?.isConnected == true
+        }
+
+        override fun onFinish() {
+            if(!isConnected){
+                bluetoothSocket?.close()
+            }
+            this.cancel()
+        }
+
+    }
 
     companion object{
         const val BOT_IDENTIFIER = "BattleBot"
@@ -67,11 +79,12 @@ class BattleBot(device: BluetoothDevice, name: String?) {
         }
         else if(device == null)
             return false
+        timeoutCountDownTimer.start()
         try{
             bluetoothSocket?.connect()
         }
         catch(ex : Exception){
-            ex.printStackTrace()
+            timeoutCountDownTimer.cancel()
             return false
         }
         if(bluetoothSocket?.isConnected!!) {
@@ -133,17 +146,28 @@ class BattleBot(device: BluetoothDevice, name: String?) {
             }
         }.invokeOnCompletion {
             if(msg.isNotEmpty()){
-                outStream?.write(msg)
+                try {
+                    outStream?.write(msg)
+                }catch(ex : IOException){
+                    isConnected = false
+                    bluetoothSocket?.close()
+                }
             }
         }
     }
 
     fun enterCombat(){
         this.isInBattle = true
+        if(bluetoothSocket?.isConnected == true){
+            sendDataToBot("EnteringCombat")
+        }
     }
 
     fun exitCombat(){
         this.isInBattle = false
+        if(bluetoothSocket?.isConnected == true){
+            sendDataToBot("ExitingCombat")
+        }
     }
 
     private fun strToByteArr(str : String, arr : ByteArray){
@@ -160,7 +184,7 @@ class BattleBot(device: BluetoothDevice, name: String?) {
     }
 
     fun disconnect(){
-        if(bluetoothSocket?.isConnected!!) {
+        if(bluetoothSocket?.isConnected == true) {
             inStream?.close()
             outStream?.close()
             inStreamReader?.close()

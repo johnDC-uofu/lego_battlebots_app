@@ -2,19 +2,21 @@ package com.asimplenerd.legobattlebots
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.os.Looper
+import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.annotation.UiThread
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_connection.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 
 /**
@@ -71,24 +73,23 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
                     val dialog = AlertDialog.Builder(context)
                     val connectionSpinner = layoutInflater.inflate(R.layout.connection_dialog, null)
                     val alert = dialog.setView(connectionSpinner).setCancelable(false).show()
-                    GlobalScope.launch {
+                    val connRoutine = GlobalScope.launch(Dispatchers.Main){
                         MainActivity.stopScan()
 
                         if (battleBot != null && battleBot!!.connect()) {
                             //Stop adapter scan for faster connection
                             //connWheel.visibility = View.GONE
-                            showWeaponsFrag()
                         } else {
                             //connWheel.visibility = View.GONE
-                            Toast.makeText(
-                                context,
-                                "FAILED TO CONNECT TO BOT WITH ID: $botId",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Toast.makeText(this@ConnectionFragment.context, "Unable to connect to Bot", Toast.LENGTH_SHORT).show()
+                            this.cancel("Failed to connect to Bot")
                         }
-                    }.invokeOnCompletion {
+                    }.invokeOnCompletion { throwable: Throwable? ->
+                        if(battleBot?.isConnected()!!)
+                            showWeaponsFrag()
                         alert.cancel()
                     }
+                v.isEnabled = true
             }
             R.id.goBackBtn -> showMenuFrag()
 
@@ -114,12 +115,12 @@ class ConnectionFragment : Fragment(), View.OnClickListener{
 
     private fun showWeaponsFrag(){
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, WeaponSelectFragment()).addToBackStack("Game").commit()
+        fragMan.beginTransaction().replace(R.id.interactionFragment, WeaponSelectFragment()).addToBackStack("Connection").commit()
     }
 
     private fun showMenuFrag(){
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, WelcomeFragment()).addToBackStack("Welcome").commit()
+        fragMan.beginTransaction().replace(R.id.interactionFragment, WelcomeFragment()).commit()
     }
 
 }

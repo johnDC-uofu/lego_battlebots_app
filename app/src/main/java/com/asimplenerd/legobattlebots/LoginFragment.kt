@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
@@ -73,7 +74,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
     private fun goBack(){
 
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, WelcomeFragment()).addToBackStack("Welcome").commit()
+        fragMan.popBackStack("Welcome", FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
    private fun registerUser()
@@ -117,7 +118,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
                         MainActivity.username = uEmail
 
                         val fragMan = this.parentFragmentManager
-                        fragMan.beginTransaction().replace(R.id.interactionFragment, WelcomeFragment()).addToBackStack("Welcome").commit()
+                        fragMan.popBackStack("Welcome", FragmentManager.POP_BACK_STACK_INCLUSIVE)
 
                     } else {
                         // If sign in fails, display a message to the user.
@@ -169,7 +170,7 @@ class LoginFragment : Fragment(), View.OnClickListener {
 
                             MainActivity.username = emailInput.text.toString()
                             val fragMan = this.parentFragmentManager
-                            fragMan.beginTransaction().replace(R.id.interactionFragment, WelcomeFragment()).addToBackStack("Welcome").commit()
+                            fragMan.popBackStack("Welcome", FragmentManager.POP_BACK_STACK_INCLUSIVE)
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.exception)

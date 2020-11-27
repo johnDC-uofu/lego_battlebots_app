@@ -68,7 +68,7 @@ class WelcomeFragment : Fragment(), View.OnClickListener {
     private fun showConnectionFrag(){
         //Stop scanning for new devices as we will need the list now
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, ConnectionFragment()).addToBackStack("Connect").commit()
+        fragMan.beginTransaction().replace(R.id.interactionFragment, ConnectionFragment()).addToBackStack("Welcome").commit()
     }
 //
 //    fun showGameFrag(){

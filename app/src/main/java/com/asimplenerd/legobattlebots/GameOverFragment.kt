@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import kotlinx.android.synthetic.main.game_over.*
 
 class GameOverFragment : Fragment(), View.OnClickListener {
@@ -44,12 +45,12 @@ class GameOverFragment : Fragment(), View.OnClickListener {
 
     private fun showConnectionFrag(){
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, ConnectionFragment()).addToBackStack("Connect").commit()
+        fragMan.popBackStack("Connection", FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
     private fun showWelcomeFrag(){
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, WelcomeFragment()).addToBackStack("Welcome").commit()
+        fragMan.popBackStack("Welcome", FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
 

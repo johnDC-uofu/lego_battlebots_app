@@ -53,7 +53,11 @@ class Game : Fragment(), View.OnTouchListener {
         updateUserName(MainActivity.username)
 
         updateBotId(ConnectionFragment.botId)
+        if(armorLoop.isAlive)
+            armorLoop.endLoop()
         armorLoop.startLoop(false)
+        if(outputLoop.isAlive)
+            outputLoop.endLoop()
         outputLoop.startLoop(true)
     }
 
@@ -81,7 +85,7 @@ class Game : Fragment(), View.OnTouchListener {
         //Disconnect from the bot
         ConnectionFragment.battleBot?.disconnect()
         val fragMan = this.parentFragmentManager
-        fragMan.beginTransaction().replace(R.id.interactionFragment, GameOverFragment()).addToBackStack("Welcome").commit()
+        fragMan.beginTransaction().replace(R.id.interactionFragment, GameOverFragment()).commit()
     }
 
     fun update(output : Boolean) {
