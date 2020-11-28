@@ -39,6 +39,12 @@ class Game : Fragment(), View.OnTouchListener {
 
     }
 
+    override fun onStop() {
+        armorLoop.endLoop()
+        outputLoop.endLoop()
+        super.onStop()
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onActivityCreated(savedInstanceState: Bundle?) {
 

@@ -184,6 +184,7 @@ class BattleBot(device: BluetoothDevice, name: String?) {
     }
 
     fun disconnect(){
+        exitCombat()
         if(bluetoothSocket?.isConnected == true) {
             inStream?.close()
             outStream?.close()
